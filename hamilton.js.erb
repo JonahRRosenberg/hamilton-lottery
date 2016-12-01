@@ -1,0 +1,38 @@
+javascript:
+
+var isHomeLotteryPage = window.location.href.indexOf('show/hamilton-chicago') > -1;
+var isMobileLotteryForm = window.location.href.indexOf('enter-lottery') > -1;
+var isDifferentPage = !isHomeLotteryPage && !isMobileLotteryForm;
+
+if (isDifferentPage) {
+  window.location.href = 'https://lottery.broadwaydirect.com/show/hamilton-chicago/';
+} else {
+  var populateForm = function(doc) {
+    doc.getElementById('dlslot_name_first').value = '<%= @first_name %>';
+    doc.getElementById('dlslot_name_last').value = '<%= @last_name %>';
+    doc.getElementById('dlslot_ticket_qty').value = 2;
+    doc.getElementById('dlslot_email').value = '<%= @email %>';
+    doc.getElementById('dlslot_dob_month').value = '<%= @month %>';
+    doc.getElementById('dlslot_dob_day').value = '<%= @day %>';
+    doc.getElementById('dlslot_dob_year').value = '<%= @year %>';
+    doc.getElementById('dlslot_zip').value = '<%= @zip_code %>';
+    doc.getElementById('dlslot_agree').checked = true;
+  };
+
+  if (isHomeLotteryPage) {
+    var enterElementsHtml = document.getElementsByClassName('enter-button');
+    var enterElement = enterElementsHtml[0];
+    if (enterElement) {
+      enterElement.click();
+
+      var iframe = document.getElementsByClassName('fancybox-iframe')[0];
+
+      iframe.addEventListener('load', function() {
+        var inneriframe = iframe.contentDocument || iframe.contentWindow.document;
+        populateForm(inneriframe);
+      });
+    }
+  } else if (isMobileLotteryForm) {
+    populateForm(document);
+  }
+}
